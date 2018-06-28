@@ -30,6 +30,33 @@ defmodule ExAws.SSM do
     value: binary
   ]
 
+  @type get_parameter_params :: [
+    with_decription: boolean
+  ]
+
+
+  @spec get_parameters(names :: binary) :: ExAws.Operation.JSON.t
+  @spec get_parameters(names :: binary, params :: get_parameter_params) :: ExAws.Operation.JSON.t
+  def get_parameter(name, params \\ []) do
+    query_params = %{
+      "Name" => name,
+      "WithDecryption" => params[:with_decription] || false
+    }
+
+    request(:get_parameter, query_params)
+  end
+
+  @spec get_parameters(names :: list(binary)) :: ExAws.Operation.JSON.t
+  @spec get_parameters(names :: list(binary), params :: get_parameter_params) :: ExAws.Operation.JSON.t
+  def get_parameters(names, params \\ []) do
+    query_params = %{
+      "Names" => names,
+      "WithDecryption" => params[:with_decription] || false
+    }
+
+    request(:get_parameters, query_params)
+  end
+
   @doc """
   Retrieve parameters in a specific hierarchy.
   """

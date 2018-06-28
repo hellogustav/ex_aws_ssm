@@ -1,6 +1,40 @@
 defmodule ExAws.SSMTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   doctest ExAws.SSM
+
+  test "GetParameter" do
+    assert %ExAws.Operation.JSON{
+      before_request: nil,
+      data: %{
+        "Name" => "/test/db/pass",
+        "WithDecryption" => true
+      },
+      headers: [{"x-amz-target", "AmazonSSM.GetParameter"},
+                {"content-type", "application/x-amz-json-1.1"}],
+      http_method: :post,
+      parser: _,
+      path: "/",
+      service: :ssm,
+      stream_builder: nil
+    } = ExAws.SSM.get_parameter("/test/db/pass", with_decription: true)
+  end
+
+  test "GetParameters" do
+    assert %ExAws.Operation.JSON{
+      before_request: nil,
+      data: %{
+        "Names" => ["/test/db/user", "/test/db/pass"],
+        "WithDecryption" => true
+      },
+      headers: [{"x-amz-target", "AmazonSSM.GetParameters"},
+                {"content-type", "application/x-amz-json-1.1"}],
+      http_method: :post,
+      parser: _,
+      path: "/",
+      service: :ssm,
+      stream_builder: nil
+    } = ExAws.SSM.get_parameters(["/test/db/user", "/test/db/pass"], with_decription: true)
+  end
 
   test "GetParametersByPath" do
     assert %ExAws.Operation.JSON{
