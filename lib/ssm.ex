@@ -20,41 +20,75 @@ defmodule ExAws.SSM do
     values: list(binary)
   ]
 
+  @type put_parameter_params :: [
+    allowed_pattern: binary,
+    description: binary,
+    key_id: binary,
+    name: binary,
+    overwrite: boolean,
+    type: binary,
+    value: binary
+  ]
+
   @doc """
   Retrieve parameters in a specific hierarchy.
   """
   @spec get_parameters_by_path(path :: binary) :: ExAws.Operation.JSON.t
   @spec get_parameters_by_path(path :: binary, params :: get_parameters_by_path_params) :: ExAws.Operation.JSON.t
   def get_parameters_by_path(path, params \\ []) do
-    params = %{
+    query_params = %{
       "Path" => path,
       "Recursive" => params[:recursive] || false,
       "WithDecryption" => params[:with_decription] || false
     }
 
-    params = case params[:max_results] do
-      nil -> params
-      _ -> Map.put(params, "MaxResults", params[:max_results])
-    end  
-
-    params = case params[:next_token] do
-      nil -> params
-      _ -> Map.put(params, "NextToken", params[:next_token])
+    query_params = case params[:max_results] do
+      nil -> query_params
+      _ -> Map.put(query_params, "MaxResults", params[:max_results])
     end
 
-    case is_list(params[:parameter_filters]) do
-      false -> params
-      true -> params[:parameter_filters] 
+    query_params = case params[:next_token] do
+      nil -> query_params
+      _ -> Map.put(query_params, "NextToken", params[:next_token])
+    end
+
+    query_params = case is_list(params[:parameter_filters]) do
+      false -> query_params
+      true -> params[:parameter_filters]
         |> Enum.map(fn filter -> 
         %{
           "Key" => filter[:key],
           "Option" => filter[:option],
           "Values" => filter[:values]
         }
-      end)
+      end) |> (&(Map.put(query_params, "ParameterFilters", &1))).()
     end
 
-    request(:get_parameters_by_path, params)
+    request(:get_parameters_by_path, query_params)
+  end
+
+  @spec put_parameter(params :: put_parameter_params) :: ExAws.Operation.JSON.t
+  def put_parameter(params) do
+    value_type = case params[:type] do
+      :string -> "String"
+      :string_list -> "StringList"
+      :secure_string -> "SecureString"
+    end
+
+    query_params = %{
+      "Name" => params[:name],
+      "Overwrite" => params[:overwrite] || false,
+      "Value" => params[:value],
+      "Type" => value_type,
+      "Description" => params[:description] || ""
+    }
+
+    query_params = case params[:key_id] do
+      nil -> query_params
+      _ -> Map.put(query_params, "KeyId", params[:key_id])
+    end
+
+    request(:put_parameter, query_params)
   end
 
   defp request(action, params) do
