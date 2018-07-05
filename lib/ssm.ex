@@ -8,7 +8,7 @@ defmodule ExAws.SSM do
   @type get_parameters_by_path_params :: [
     path: binary,
     recursive: boolean,
-    with_decription: boolean,
+    with_decryption: boolean,
     max_results: pos_integer,
     next_token: binary,
     parameter_filters: list(parameter_filters)
@@ -31,7 +31,7 @@ defmodule ExAws.SSM do
   ]
 
   @type get_parameter_params :: [
-    with_decription: boolean
+    with_decryption: boolean
   ]
 
 
@@ -40,7 +40,7 @@ defmodule ExAws.SSM do
   def get_parameter(name, params \\ []) do
     query_params = %{
       "Name" => name,
-      "WithDecryption" => params[:with_decription] || false
+      "WithDecryption" => params[:with_decryption] || false
     }
 
     request(:get_parameter, query_params)
@@ -51,7 +51,7 @@ defmodule ExAws.SSM do
   def get_parameters(names, params \\ []) do
     query_params = %{
       "Names" => names,
-      "WithDecryption" => params[:with_decription] || false
+      "WithDecryption" => params[:with_decryption] || false
     }
 
     request(:get_parameters, query_params)
@@ -66,7 +66,7 @@ defmodule ExAws.SSM do
     query_params = %{
       "Path" => path,
       "Recursive" => params[:recursive] || false,
-      "WithDecryption" => params[:with_decription] || false
+      "WithDecryption" => params[:with_decryption] || false
     }
 
     query_params = case params[:max_results] do
@@ -82,7 +82,7 @@ defmodule ExAws.SSM do
     query_params = case is_list(params[:parameter_filters]) do
       false -> query_params
       true -> params[:parameter_filters]
-        |> Enum.map(fn filter -> 
+        |> Enum.map(fn filter ->
         %{
           "Key" => filter[:key],
           "Option" => filter[:option],

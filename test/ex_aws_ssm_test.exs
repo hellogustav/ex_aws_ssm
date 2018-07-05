@@ -16,7 +16,7 @@ defmodule ExAws.SSMTest do
       path: "/",
       service: :ssm,
       stream_builder: nil
-    } = ExAws.SSM.get_parameter("/test/db/pass", with_decription: true)
+    } = ExAws.SSM.get_parameter("/test/db/pass", with_decryption: true)
   end
 
   test "GetParameters" do
@@ -33,7 +33,7 @@ defmodule ExAws.SSMTest do
       path: "/",
       service: :ssm,
       stream_builder: nil
-    } = ExAws.SSM.get_parameters(["/test/db/user", "/test/db/pass"], with_decription: true)
+    } = ExAws.SSM.get_parameters(["/test/db/user", "/test/db/pass"], with_decryption: true)
   end
 
   test "GetParametersByPath" do
