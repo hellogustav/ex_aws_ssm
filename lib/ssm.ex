@@ -34,9 +34,11 @@ defmodule ExAws.SSM do
     with_decryption: boolean
   ]
 
-
-  @spec get_parameters(names :: binary) :: ExAws.Operation.JSON.t
-  @spec get_parameters(names :: binary, params :: get_parameter_params) :: ExAws.Operation.JSON.t
+  @doc """
+  Get information about a parameter by using the parameter name.
+  """
+  @spec get_parameter(name :: binary) :: ExAws.Operation.JSON.t
+  @spec get_parameter(name :: binary, params :: get_parameter_params) :: ExAws.Operation.JSON.t
   def get_parameter(name, params \\ []) do
     query_params = %{
       "Name" => name,
@@ -46,6 +48,9 @@ defmodule ExAws.SSM do
     request(:get_parameter, query_params)
   end
 
+  @doc """
+  Get details of a parameter
+  """
   @spec get_parameters(names :: list(binary)) :: ExAws.Operation.JSON.t
   @spec get_parameters(names :: list(binary), params :: get_parameter_params) :: ExAws.Operation.JSON.t
   def get_parameters(names, params \\ []) do
@@ -94,6 +99,9 @@ defmodule ExAws.SSM do
     request(:get_parameters_by_path, query_params)
   end
 
+  @doc """
+  Add a parameter to the system.
+  """
   @spec put_parameter(params :: put_parameter_params) :: ExAws.Operation.JSON.t
   def put_parameter(params) do
     value_type = case params[:type] do
