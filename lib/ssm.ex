@@ -34,6 +34,13 @@ defmodule ExAws.SSM do
     with_decryption: boolean
   ]
 
+  @type get_parameter_history_params :: [
+    max_results: pos_integer,
+    name: binary,
+    next_token: binary,
+    with_decryption: boolean
+  ]
+
   @doc """
   Get information about a parameter by using the parameter name.
   """
@@ -124,6 +131,44 @@ defmodule ExAws.SSM do
     end
 
     request(:put_parameter, query_params)
+  end
+
+  @doc """
+  Delete a parameter from the system.
+  """
+  @spec delete_parameter(name :: binary) :: ExAws.Operation.JSON.t
+  def delete_parameter(name) do
+    request(:delete_parameter, %{"Name" => name})
+  end
+
+  @doc """
+  Delete a list of parameters.
+  """
+  @spec delete_parameters(names :: list(binary)) :: ExAws.Operation.JSON.t
+  def delete_parameters(names) do
+    request(:delete_parameters, %{"Names" => names})
+  end
+
+  @doc """
+  Query a list of all parameters used by the AWS account.
+  """
+  @spec get_parameter_history(name :: binary, params :: get_parameter_history_params) :: ExAws.Operation.JSON.t
+  def get_parameter_history(name, params \\ []) do
+    query_params = %{
+      "Name" => name,
+      "WithDecryption" => params[:with_decryption] || false
+    }
+    query_params = case params[:max_results] do
+      nil -> query_params
+      _ -> Map.put(query_params, "MaxResults", params[:max_results])
+    end
+
+    query_params = case params[:next_token] do
+      nil -> query_params
+      _ -> Map.put(query_params, "NextToken", params[:next_token])
+    end
+
+    request(:get_parameter_history, query_params)
   end
 
   defp request(action, params) do
