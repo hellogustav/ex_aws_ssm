@@ -1,5 +1,7 @@
 # ExAws.SSM
 
+Service module for https://github.com/ex-aws/ex_aws
+
 Add support for SSM to ExAws
 
 Documentation can be found at [https://hexdocs.pm/ex_aws_ssm](https://hexdocs.pm/ex_aws_ssm).
@@ -26,7 +28,7 @@ The package can be installed by adding ex_aws_ssm to your list of dependencies i
 def deps do
   [
     {:ex_aws, "~> 2.0"},
-    {:ex_aws_ssm, "~> 2.0.1"},
+    {:ex_aws_ssm, "~> 2.0.3"},
     {:poison, "~> 3.0"},
     {:hackney, "~> 1.9"},
   ]
