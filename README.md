@@ -2,7 +2,9 @@
 
 Add support for SSM to ExAws
 
-## Coverage
+Documentation can be found at [https://hexdocs.pm/ex_aws_ssm](https://hexdocs.pm/ex_aws_ssm).
+
+## API Coverage
 
 Currently only the following actions are supported.
 
@@ -31,5 +33,12 @@ def deps do
 end
 ```
 
-Documentation can be found at [https://hexdocs.pm/ex_aws_ssm](https://hexdocs.pm/ex_aws_ssm).
+## AWS Region Configuration.
+You can set the region used by default for requests.
+```elixir
+config :ex_aws, ssm: [
+  region: "us-west-2"
+]
+```
+
 
