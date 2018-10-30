@@ -16,6 +16,8 @@ defmodule ExAws.SSM do
           | pagination_opts
           | decryption_opt
 
+  @type parameter_value_type :: :string | :string_list | :secure_string
+
   @type parameter_filters :: [
           key: binary,
           option: binary,
@@ -26,10 +28,7 @@ defmodule ExAws.SSM do
           {:allowed_pattern, binary}
           | {:description, binary}
           | {:key_id, binary}
-          | {:name, binary}
           | {:overwrite, boolean}
-          | {:type, binary}
-          | {:value, binary}
 
   @type get_parameter_opt :: decryption_opt
 
@@ -106,9 +105,14 @@ defmodule ExAws.SSM do
   @doc """
   Add a parameter to the system.
   """
-  @spec put_parameter(name :: binary, type :: atom, value :: binary, opts :: [put_parameter_opt]) ::
-          ExAws.Operation.JSON.t()
-  def put_parameter(name, type, value, opts \\ []) do
+  @spec put_parameter(
+          name :: binary,
+          type :: parameter_value_type,
+          value :: binary,
+          opts :: [put_parameter_opt]
+        ) :: ExAws.Operation.JSON.t()
+  def put_parameter(name, type, value, opts \\ [])
+      when type in [:string, :string_list, :secure_string] do
     value_type =
       case type do
         :string -> "String"
