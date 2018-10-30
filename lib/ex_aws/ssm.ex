@@ -5,14 +5,16 @@ defmodule ExAws.SSM do
   import ExAws.SSM.Utils
   @version "2014-11-06"
 
-  @type get_parameters_by_path_params :: [
-          path: binary,
-          recursive: boolean,
-          with_decryption: boolean,
-          max_results: pos_integer,
-          next_token: binary,
-          parameter_filters: list(parameter_filters)
-        ]
+  @type decryption_opt :: {:with_decryption, boolean}
+  @type pagination_opts ::
+          {:max_results, pos_integer}
+          | {:next_token, binary}
+
+  @type get_parameters_by_path_opt ::
+          {:recursive, boolean}
+          | {:parameter_filters, list(parameter_filters)}
+          | pagination_opts
+          | decryption_opt
 
   @type parameter_filters :: [
           key: binary,
@@ -20,79 +22,74 @@ defmodule ExAws.SSM do
           values: list(binary)
         ]
 
-  @type put_parameter_params :: [
-          allowed_pattern: binary,
-          description: binary,
-          key_id: binary,
-          name: binary,
-          overwrite: boolean,
-          type: binary,
-          value: binary
-        ]
+  @type put_parameter_opt ::
+          {:allowed_pattern, binary}
+          | {:description, binary}
+          | {:key_id, binary}
+          | {:name, binary}
+          | {:overwrite, boolean}
+          | {:type, binary}
+          | {:value, binary}
 
-  @type get_parameter_params :: [
-          with_decryption: boolean
-        ]
+  @type get_parameter_opt :: decryption_opt
 
-  @type get_parameter_history_params :: [
-          max_results: pos_integer,
-          name: binary,
-          next_token: binary,
-          with_decryption: boolean
-        ]
+  @type get_parameter_history_opt ::
+          {:name, binary}
+          | pagination_opts
+          | decryption_opt
 
   @doc """
   Get information about a parameter by using the parameter name.
   """
   @spec get_parameter(name :: binary) :: ExAws.Operation.JSON.t()
-  @spec get_parameter(name :: binary, params :: get_parameter_params) :: ExAws.Operation.JSON.t()
-  def get_parameter(name, params \\ []) do
-    query_params = %{
+  @spec get_parameter(name :: binary, opts :: [get_parameter_opt]) :: ExAws.Operation.JSON.t()
+  def get_parameter(name, opts \\ []) do
+    params = %{
       "Name" => name,
-      "WithDecryption" => params[:with_decryption] || false
+      "WithDecryption" => opts[:with_decryption] || false
     }
 
-    request(:get_parameter, query_params)
+    request(:get_parameter, params)
   end
 
   @doc """
   Get details of a parameter
   """
   @spec get_parameters(names :: list(binary)) :: ExAws.Operation.JSON.t()
-  @spec get_parameters(names :: list(binary), params :: get_parameter_params) ::
+  @spec get_parameters(names :: list(binary), opts :: [get_parameter_opt]) ::
           ExAws.Operation.JSON.t()
-  def get_parameters(names, params \\ []) do
-    query_params = %{
+  def get_parameters(names, opts \\ []) do
+    params = %{
       "Names" => names,
-      "WithDecryption" => params[:with_decryption] || false
+      "WithDecryption" => opts[:with_decryption] || false
     }
 
-    request(:get_parameters, query_params)
+    request(:get_parameters, params)
   end
 
   @doc """
   Retrieve parameters in a specific hierarchy.
   """
   @spec get_parameters_by_path(path :: binary) :: ExAws.Operation.JSON.t()
-  @spec get_parameters_by_path(path :: binary, params :: get_parameters_by_path_params) ::
+  @spec get_parameters_by_path(path :: binary, opts :: [get_parameters_by_path_opt]) ::
           ExAws.Operation.JSON.t()
-  def get_parameters_by_path(path, params \\ []) do
-    query_params =
+  def get_parameters_by_path(path, opts \\ []) do
+    params =
       %{
         "Path" => path,
-        "Recursive" => params[:recursive] || false,
-        "WithDecryption" => params[:with_decryption] || false
+        "Recursive" => opts[:recursive] || false,
+        "WithDecryption" => opts[:with_decryption] || false
       }
-      |> maybe_add_max_results(params)
-      |> maybe_add_next_token(params)
+      |> maybe_add_max_results(opts)
+      |> maybe_add_next_token(opts)
 
-    query_params =
-      case is_list(params[:parameter_filters]) do
+    params =
+      case is_list(opts[:parameter_filters]) do
         false ->
-          query_params
+          params
 
         true ->
-          params[:parameter_filters]
+          opts[:parameter_filters]
           |> Enum.map(fn filter ->
             %{
               "Key" => filter[:key],
@@ -100,35 +97,36 @@ defmodule ExAws.SSM do
               "Values" => filter[:values]
             }
           end)
-          |> (&Map.put(query_params, "ParameterFilters", &1)).()
+          |> (&Map.put(params, "ParameterFilters", &1)).()
       end
 
-    request(:get_parameters_by_path, query_params)
+    request(:get_parameters_by_path, params)
   end
 
   @doc """
   Add a parameter to the system.
   """
-  @spec put_parameter(params :: put_parameter_params) :: ExAws.Operation.JSON.t()
-  def put_parameter(params) do
+  @spec put_parameter(name :: binary, type :: atom, value :: binary, opts :: [put_parameter_opt]) ::
+          ExAws.Operation.JSON.t()
+  def put_parameter(name, type, value, opts \\ []) do
     value_type =
-      case params[:type] do
+      case type do
         :string -> "String"
         :string_list -> "StringList"
         :secure_string -> "SecureString"
       end
 
-    query_params =
+    params =
       %{
-        "Name" => params[:name],
-        "Overwrite" => params[:overwrite] || false,
-        "Value" => params[:value],
+        "Name" => name,
+        "Overwrite" => opts[:overwrite] || false,
+        "Value" => value,
         "Type" => value_type,
-        "Description" => params[:description] || ""
+        "Description" => opts[:description] || ""
       }
-      |> maybe_add_key_id(params)
+      |> maybe_add_key_id(opts)
 
-    request(:put_parameter, query_params)
+    request(:put_parameter, params)
   end
 
   @doc """
@@ -150,18 +148,18 @@ defmodule ExAws.SSM do
   @doc """
   Query a list of all parameters used by the AWS account.
   """
-  @spec get_parameter_history(name :: binary, params :: get_parameter_history_params) ::
+  @spec get_parameter_history(name :: binary, opts :: [get_parameter_history_opt]) ::
           ExAws.Operation.JSON.t()
-  def get_parameter_history(name, params \\ []) do
-    query_params =
+  def get_parameter_history(name, opts \\ []) do
+    params =
       %{
         "Name" => name,
-        "WithDecryption" => params[:with_decryption] || false
+        "WithDecryption" => opts[:with_decryption] || false
       }
-      |> maybe_add_max_results(params)
-      |> maybe_add_next_token(params)
+      |> maybe_add_max_results(opts)
+      |> maybe_add_next_token(opts)
 
-    request(:get_parameter_history, query_params)
+    request(:get_parameter_history, params)
   end
 
   defp request(action, params) do

@@ -81,11 +81,11 @@ defmodule ExAws.SSMTest do
     assert %ExAws.Operation.JSON{
              before_request: nil,
              data: %{
-               "Name" => "pass",
+               "Name" => "/blueberry/pankakes",
                "Overwrite" => true,
-               "Type" => "String",
+               "Type" => "SecureString",
                "Value" => "test1234",
-               "Description" => "A password",
+               "Description" => "A secure string",
                "KeyId" => "3cd0aeb4-f30a-4676-a78f-242fb73e76d4"
              },
              headers: [
@@ -99,11 +99,11 @@ defmodule ExAws.SSMTest do
              stream_builder: nil
            } =
              ExAws.SSM.put_parameter(
-               name: "pass",
+               "/blueberry/pankakes",
+               :secure_string,
+               "test1234",
                overwrite: true,
-               type: :string,
-               value: "test1234",
-               description: "A password",
+               description: "A secure string",
                key_id: "3cd0aeb4-f30a-4676-a78f-242fb73e76d4"
              )
   end

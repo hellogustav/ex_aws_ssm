@@ -2,7 +2,7 @@ defmodule ExAwsSsm.MixProject do
   use Mix.Project
 
   @name "ExAws.SSM"
-  @version "2.0.3"
+  @version "2.0.4"
   @url "https://github.com/hellogustav/ex_aws_ssm"
 
   def project do
