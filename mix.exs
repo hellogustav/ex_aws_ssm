@@ -12,7 +12,7 @@ defmodule ExAwsSsm.MixProject do
       version: @version,
       elixir: "~> 1.5",
       start_permanent: Mix.env() == :prod,
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       description: description(),
       deps: deps(),
       docs: docs(),
@@ -48,7 +48,7 @@ defmodule ExAwsSsm.MixProject do
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib",]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
@@ -63,7 +63,7 @@ defmodule ExAwsSsm.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:hackney, ">= 0.0.0", only: [:dev, :test]},
       {:poison, ">= 0.0.0", only: [:dev, :test]},
-      ex_aws(),
+      ex_aws()
     ]
   end
 
