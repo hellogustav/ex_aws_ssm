@@ -2,7 +2,7 @@ defmodule ExAws.SSM do
   @moduledoc """
   Documentation for ExAws.SSM.
   """
-
+  import ExAws.SSM.Utils
   @version "2014-11-06"
 
   @type get_parameters_by_path_params :: [
@@ -77,23 +77,14 @@ defmodule ExAws.SSM do
   @spec get_parameters_by_path(path :: binary, params :: get_parameters_by_path_params) ::
           ExAws.Operation.JSON.t()
   def get_parameters_by_path(path, params \\ []) do
-    query_params = %{
-      "Path" => path,
-      "Recursive" => params[:recursive] || false,
-      "WithDecryption" => params[:with_decryption] || false
-    }
-
     query_params =
-      case params[:max_results] do
-        nil -> query_params
-        _ -> Map.put(query_params, "MaxResults", params[:max_results])
-      end
-
-    query_params =
-      case params[:next_token] do
-        nil -> query_params
-        _ -> Map.put(query_params, "NextToken", params[:next_token])
-      end
+      %{
+        "Path" => path,
+        "Recursive" => params[:recursive] || false,
+        "WithDecryption" => params[:with_decryption] || false
+      }
+      |> maybe_add_max_results(params)
+      |> maybe_add_next_token(params)
 
     query_params =
       case is_list(params[:parameter_filters]) do
@@ -127,19 +118,15 @@ defmodule ExAws.SSM do
         :secure_string -> "SecureString"
       end
 
-    query_params = %{
-      "Name" => params[:name],
-      "Overwrite" => params[:overwrite] || false,
-      "Value" => params[:value],
-      "Type" => value_type,
-      "Description" => params[:description] || ""
-    }
-
     query_params =
-      case params[:key_id] do
-        nil -> query_params
-        _ -> Map.put(query_params, "KeyId", params[:key_id])
-      end
+      %{
+        "Name" => params[:name],
+        "Overwrite" => params[:overwrite] || false,
+        "Value" => params[:value],
+        "Type" => value_type,
+        "Description" => params[:description] || ""
+      }
+      |> maybe_add_key_id(params)
 
     request(:put_parameter, query_params)
   end
@@ -166,22 +153,13 @@ defmodule ExAws.SSM do
   @spec get_parameter_history(name :: binary, params :: get_parameter_history_params) ::
           ExAws.Operation.JSON.t()
   def get_parameter_history(name, params \\ []) do
-    query_params = %{
-      "Name" => name,
-      "WithDecryption" => params[:with_decryption] || false
-    }
-
     query_params =
-      case params[:max_results] do
-        nil -> query_params
-        _ -> Map.put(query_params, "MaxResults", params[:max_results])
-      end
-
-    query_params =
-      case params[:next_token] do
-        nil -> query_params
-        _ -> Map.put(query_params, "NextToken", params[:next_token])
-      end
+      %{
+        "Name" => name,
+        "WithDecryption" => params[:with_decryption] || false
+      }
+      |> maybe_add_max_results(params)
+      |> maybe_add_next_token(params)
 
     request(:get_parameter_history, query_params)
   end
