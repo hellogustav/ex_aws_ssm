@@ -8,9 +8,9 @@ Documentation can be found at [https://hexdocs.pm/ex_aws_ssm](https://hexdocs.pm
 
 ## API Coverage
 
-Currently only the following actions are supported.
+The following actions are currently supported.
 
-| supported              |
+| action              |
 | ---------------------- |
 | delete_parameter       |
 | delete_parameters      |
@@ -35,8 +35,16 @@ def deps do
 end
 ```
 
-## AWS Region Configuration.
-You can set the region used by default for requests.
+## Testing
+To run integration tests run the included `docker-compose.yml` using `docker-compose up` to start [localstack](https://github.com/localstack/localstack).
+Now we can include integration tests by running `mix test` as:
+```
+$ mix test --include integration:true
+```
+
+## Configuration
+You can set service specific configuration for `:ssm` in the same way as with other `ex_aws` service modules.
+
 ```elixir
 config :ex_aws, ssm: [
   region: "us-west-2"
