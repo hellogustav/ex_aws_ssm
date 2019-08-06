@@ -1,9 +1,10 @@
 defmodule ExAws.SSM do
   @moduledoc """
   Documentation for ExAws.SSM.
+  
+  AWS API version 2014-11-06.
   """
   import ExAws.SSM.Utils
-  @version "2014-11-06"
 
   @type decryption_opt :: {:with_decryption, boolean}
   @type pagination_opts ::
