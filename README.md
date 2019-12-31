@@ -27,8 +27,8 @@ The package can be installed by adding ex_aws_ssm to your list of dependencies i
 ```elixir
 def deps do
   [
-    {:ex_aws, "~> 2.0"},
-    {:ex_aws_ssm, "~> 2.0"},
+    {:ex_aws, "~> 2.1"},
+    {:ex_aws_ssm, "~> 2.1"},
     {:poison, "~> 3.0"},
     {:hackney, "~> 1.9"},
   ]

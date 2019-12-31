@@ -2,7 +2,7 @@ defmodule ExAws.SSM.MixProject do
   use Mix.Project
 
   @name "ExAws.SSM"
-  @version "2.1.0"
+  @version "2.1.1"
   @url "https://github.com/hellogustav/ex_aws_ssm"
 
   def project do
@@ -70,7 +70,7 @@ defmodule ExAws.SSM.MixProject do
   defp ex_aws() do
     case System.get_env("AWS") do
       "LOCAL" -> {:ex_aws, path: "../ex_aws"}
-      _ -> {:ex_aws, "~> 2.0"}
+      _ -> {:ex_aws, "~> 2.1"}
     end
   end
 end
